@@ -1,4 +1,4 @@
-from typing import Callable, Tuple
+from typing import Callable, Tuple, List
 import torch
 
 
@@ -71,47 +71,3 @@ class SinusoidSampler(Sampler):
         a = torch.rand(1).item() * (self._amplitude_range[1] - self._amplitude_range[0]) + self._amplitude_range[0]
         b = torch.rand(1).item() * (self._phase_range[1] - self._phase_range[0]) + self._phase_range[0]
         return SinusoidTask(a, b)
-
-
-class Poly5Task(Task):
-
-    def __init__(self, a: float, b: float, c: float, d: float, e: float, f: float):
-        self._a = a
-        self._b = b
-        self._c = c
-        self._d = d
-        self._e = e
-        self._f = f
-
-    @property
-    def task_name(self) -> str:
-        return f"Poly5Task"
-
-    @torch.no_grad()
-    def fn(self, x: torch.Tensor) -> torch.Tensor:
-        return self._a * x**5 + self._b * x**4 + self._c * x**3 + self._d * x**2 + self._e * x + self._f
-
-    @torch.no_grad()
-    def sample(self, num_samples: int) -> Tuple[torch.Tensor, torch.Tensor, Callable]:
-        x = torch.rand((num_samples, 1)) * 10 - 5  # Sample x in [-5, 5]
-        y = self.fn(x)  # calculate f(x)
-        loss_fct = torch.nn.MSELoss()  # use MSE loss
-        return x, y, loss_fct
-
-    
-class Poly5Sampler(Sampler):
-    """A sampler for polynomial of degree 5 tasks."""
-    _range: Tuple[float, float]
-
-    def __init__(self, range: Tuple[float, float] = (-5.0, 5.0)):
-        self._range = range
-
-    @torch.no_grad()
-    def sample_task(self) -> Poly5Task:
-        a = torch.rand(1).item() * (self._range[1] - self._range[0]) + self._range[0]
-        b = torch.rand(1).item() * (self._range[1] - self._range[0]) + self._range[0]
-        c = torch.rand(1).item() * (self._range[1] - self._range[0]) + self._range[0]
-        d = torch.rand(1).item() * (self._range[1] - self._range[0]) + self._range[0]
-        e = torch.rand(1).item() * (self._range[1] - self._range[0]) + self._range[0]
-        f = torch.rand(1).item() * (self._range[1] - self._range[0]) + self._range[0]
-        return Poly5Task(a, b, c, d, e, f)

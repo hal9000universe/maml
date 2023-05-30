@@ -68,6 +68,7 @@ if __name__ == "__main__":
     device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
     load: bool = True
     training: bool = False
+    save_fig: bool = False
 
     # MAML settings
     inner_steps: int = 1
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     num_meta_task_samples: int = 25
 
     # Fine-tuning settings
-    ft_num_steps: int = 100
+    ft_num_steps: int = 50
     ft_num_task_samples: int = 10
     ft_learning_rate: float = 2e-2
 
@@ -128,7 +129,9 @@ if __name__ == "__main__":
     )
     # After Fine-tuning
     y = model(x).detach().view(-1)  # calc y = f(x), detach to allow conversion to numpy
-    plt.plot(x.data.cpu().numpy(), y.data.cpu().numpy(), c='darkgreen', linestyle='--', linewidth=2.2, label=f'{ft_num_steps} grad step')
+    plt.plot(x.data.cpu().numpy(), y.data.cpu().numpy(), c='darkgreen', linestyle='--', 
+    linewidth=2.2, label=f'{ft_num_steps} grad step')
     plt.legend()
-    plt.savefig(f'maml - {sampler.task_name}.png')
+    if save_fig:
+        plt.savefig(f'maml - {sampler.task_name}.png')
     plt.show()
